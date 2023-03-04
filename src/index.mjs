@@ -9,7 +9,9 @@ function App(props){
         ${props.cpus.map((cpu) =>{
             return html`
                 <div class="bar">
+                    <div class = "bar-inner" style ="width: ${cpu}%"></div>
                     ${cpu.toFixed(2)} % usage 
+                    
                 </div>
             `;
         })}
@@ -20,9 +22,24 @@ function App(props){
 }
 
 
-document.addEventListener("DOMContentLoaded", ()=>{
-    let i =0;
-     setInterval(async ()=>{
+// document.addEventListener("DOMContentLoaded", ()=>{
+//     let i =0;
+//      setInterval(async ()=>{
+//         let response = await fetch('/api/cpus');
+//         if (response.status != 200){
+//             throw new Error(`HTTp error! status: ${response.status}`);
+//         }
+//         let json = await response.json();
+//         // i =i+1;
+        
+//         //  document.body.textContent = JSON.stringify(json, null, 2);        
+
+//         render(html`<${App} cpus=${json}></${App}>`, document.body);
+//      }, 1000)
+    
+// });
+
+let update = async() =>{
         let response = await fetch('/api/cpus');
         if (response.status != 200){
             throw new Error(`HTTp error! status: ${response.status}`);
@@ -33,6 +50,6 @@ document.addEventListener("DOMContentLoaded", ()=>{
         //  document.body.textContent = JSON.stringify(json, null, 2);        
 
         render(html`<${App} cpus=${json}></${App}>`, document.body);
-     }, 1000)
-    
-});
+};
+
+update();
