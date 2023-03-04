@@ -1,4 +1,24 @@
 import { h, Component, render } from 'https://unpkg.com/preact?module';
+import htm from 'https://unpkg.com/htm?module';
+
+const html = htm.bind(h);
+
+function App(props){
+    return html`
+    <div> 
+        ${props.cpus.map((cpu) =>{
+            return html`
+                <div>
+                    <h3>${cpu.toFixed(2)} % usage </h3>
+                </div>
+            `;
+        })}
+    </div>
+    `;
+
+    
+}
+
 
 document.addEventListener("DOMContentLoaded", ()=>{
     let i =0;
@@ -10,12 +30,9 @@ document.addEventListener("DOMContentLoaded", ()=>{
         let json = await response.json();
         // i =i+1;
         
-        //  document.body.textContent = JSON.stringify(json, null, 2);
+        //  document.body.textContent = JSON.stringify(json, null, 2);        
 
-
-        let app = h('pre', null, JSON.stringify(json, null, 2));
-
-        render(app, document.body);
+        render(html`<${App} cpus=${json}></${App}>`, document.body);
      }, 1000)
     
 });
