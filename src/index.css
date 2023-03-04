@@ -9,6 +9,11 @@ body{
 }
 
 .bar{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+
     background: #ffddd2;
     width: 20em;
     height: 2em;
@@ -17,7 +22,13 @@ body{
     position: relative;
 }
 
+.bar label{
+    z-index: 5;
+}
+
 .bar .bar-inner{
+    z-index: 5;
+
     background: #e29578;
     height: 100%;
     
@@ -25,5 +36,7 @@ body{
     left: 0;
     top: 0;
     bottom: 0;
+
+    transition: width 0.1s;
     
 }
