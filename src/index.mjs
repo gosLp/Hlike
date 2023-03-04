@@ -9,8 +9,8 @@ function App(props){
         ${props.cpus.map((cpu) =>{
             return html`
                 <div class="bar">
-                    <div class = "bar-inner" style ="width: ${cpu}%"></div>
-                    ${cpu.toFixed(2)} % usage 
+                    <div class="bar-inner" style="width: ${cpu}%"></div>
+                    <label>${cpu.toFixed(2)} % usage</label> 
                     
                 </div>
             `;
@@ -52,4 +52,6 @@ let update = async() =>{
         render(html`<${App} cpus=${json}></${App}>`, document.body);
 };
 
+
+setInterval(update, 1000);
 update();
