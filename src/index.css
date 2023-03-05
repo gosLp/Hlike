@@ -5,7 +5,7 @@
 }
 
 body{
-    background: #edf6f9;
+    background: #0f0f0f;
 }
 
 .bar{
@@ -14,7 +14,7 @@ body{
     justify-content: center;
 
 
-    background: #ffddd2;
+    background: #264653;
     width: 20em;
     height: 2em;
     margin: 1em;
@@ -23,13 +23,13 @@ body{
 }
 
 .bar label{
-    z-index: 5;
+    z-index: 10;
 }
 
 .bar .bar-inner{
     z-index: 5;
 
-    background: #e29578;
+    background: #2a9d8f;
     height: 100%;
     
     position: absolute;
