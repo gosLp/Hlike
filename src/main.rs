@@ -6,14 +6,34 @@ use std::sync::{Arc, Mutex };
 #[tokio::main]
 async fn main() {
 
+    let app_state = AppState::default();
+
     let app = Router::new()
         .route("/", get(root_get))
         .route("/api/cpus", get(cpus_get))
         .route("/index.mjs", get(indexmjs_get))
         .route("/index.css",  get(indexcss_get))
-        .with_state(AppState{
-            sys: Arc::new(Mutex::new(System::new())),
-        });
+        .with_state(app_state.clone());
+
+
+    let app_state_for_bg = app_state.clone();
+
+
+    //Update CPU usage in the Background
+    tokio::task::spawn_blocking(move ||{
+        let mut sys = System::new();
+        loop {
+            sys.refresh_cpu();
+            let v: Vec<f32> = sys.cpus().iter().map(|cpu| cpu.cpu_usage()).collect();
+            { 
+                let mut cpus = app_state.cpus.lock().unwrap();
+                *cpus = v;
+            }
+
+            std::thread::sleep(System::MINIMUM_CPU_UPDATE_INTERVAL);
+        }
+    });
+
     let server = Server::bind(&"0.0.0.0:7832".parse().unwrap())
         .serve(app.into_make_service());
 
@@ -22,9 +42,9 @@ async fn main() {
     server.await.unwrap();
 }
 
-#[derive(Clone)]
+#[derive(Default,Clone)]
 struct AppState{
-    sys: Arc<Mutex<System>>,
+    cpus: Arc<Mutex<Vec<f32>>>,
 
 }
 
@@ -57,12 +77,12 @@ async fn indexcss_get() -> impl IntoResponse{
 async fn cpus_get(State(state): State<AppState>) -> impl IntoResponse{
     // use std::fmt::Write;
     // let mut s = String::new(); 
-    
-    let mut sys = state.sys.lock().unwrap();
 
-    //FIXME: this blocks, yes i feel bad. Later. also find out what blocking in rust works
-    sys.refresh_cpu();
-    let v_cpus: Vec<_> = sys.cpus().iter().map(|cpu| cpu.cpu_usage()).collect();
+    let lock_start = std::time::Instant::now();
+
+    let v = state.cpus.lock().unwrap().clone();
+    let lock_elapsed = lock_start.elapsed().as_millis();
+    println!("Lock time: {:?}ms",lock_elapsed);
 
     // for (i,cpu) in sys.cpus().iter().enumerate(){
     //     let i = i+1;
@@ -71,5 +91,5 @@ async fn cpus_get(State(state): State<AppState>) -> impl IntoResponse{
     // }
 
 
-    Json(v_cpus)
+    Json(v)
 }
