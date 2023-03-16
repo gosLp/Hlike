@@ -5,7 +5,7 @@ const html = htm.bind(h);
 
 function App(props){
     return html`
-    <div> 
+    <div > 
         ${props.cpus.map((cpu) =>{
             return html`
                 <div class="bar">

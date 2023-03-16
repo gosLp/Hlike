@@ -8,19 +8,27 @@ body{
     background: #0f0f0f;
 }
 
+
 .bar{
     display: flex;
     align-items: center;
     justify-content: center;
 
+    /* flex-direction: column; */
+    
 
     background: #264653;
     width: 20em;
     height: 2em;
     margin: 1em;
+    margin-right: 10px; 
+    
+     /* overflow: hidden; */
 
     position: relative;
 }
+
+
 
 .bar label{
     z-index: 10;
@@ -38,5 +46,8 @@ body{
     bottom: 0;
 
     transition: width 0.1s;
+    /* transform: rotate(-90deg);
+    transform-origin: bottom left; */
     
 }
+
