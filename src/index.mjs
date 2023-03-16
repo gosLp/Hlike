@@ -5,11 +5,11 @@ const html = htm.bind(h);
 
 function App(props){
     return html`
-    <div > 
+    <div class= "container"> 
         ${props.cpus.map((cpu) =>{
             return html`
                 <div class="bar">
-                    <div class="bar-inner" style="width: ${cpu}%"></div>
+                    <div class="bar-inner" style="height: ${cpu}%"></div>
                     <label>${cpu.toFixed(2)} % usage</label> 
                     
                 </div>
