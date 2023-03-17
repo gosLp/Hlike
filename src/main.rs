@@ -12,9 +12,13 @@ use tokio::sync::broadcast;
 
 type Snapshot = Vec<f32>;
 
-struct d_and_c_Snaphot{
+
+
+#[derive(Clone)]
+struct DAndcSnapshot<'a>{
+    
     cpu_u: Vec<f32>,
-    // disk_info:  <'a>+&Disk,
+    disk_info:  &'a Disk,
 }
 
 #[tokio::main]
@@ -23,6 +27,8 @@ async fn main() {
     
 
     let (tx, _)= broadcast::channel::<Snapshot>(10);
+
+    let (tx2,_) = broadcast::channel::<DAndcSnapshot>(10);
 
     let app_state = AppState{
         tx: tx.clone()
