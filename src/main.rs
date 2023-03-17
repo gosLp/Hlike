@@ -5,7 +5,7 @@ use axum::{
     extract::{State, WebSocketUpgrade, ws::{WebSocket, Message}},
     Json,
     response::{IntoResponse, Html}, http::Response};
-use sysinfo::{CpuExt, System, SystemExt};
+use sysinfo::{CpuExt, System, SystemExt, Disk};
 use std::sync::{Arc, Mutex };
 use tokio::sync::broadcast;
 
@@ -14,6 +14,8 @@ type Snapshot = Vec<f32>;
 
 #[tokio::main]
 async fn main() {
+
+    
 
     let (tx, _)= broadcast::channel::<Snapshot>(10);
 
@@ -32,11 +34,23 @@ async fn main() {
 
     let app_state_for_bg = app_state.clone();
 
+    let mut sys = System::new_all();
+
+    sys.refresh_all();
+
+    println!("=> disks:" );
+    for disk in sys.disks(){
+
+        println!("{:?}", disk);
+    }
 
     //Update CPU usage in the Background
     tokio::task::spawn_blocking(move ||{
         let mut sys = System::new();
+        
+
         loop {
+            
             sys.refresh_cpu();
             let v: Vec<f32> = sys.cpus().iter().map(|cpu| cpu.cpu_usage()).collect();
             let _ =tx.send(v);
