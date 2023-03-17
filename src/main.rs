@@ -5,12 +5,17 @@ use axum::{
     extract::{State, WebSocketUpgrade, ws::{WebSocket, Message}},
     Json,
     response::{IntoResponse, Html}, http::Response};
-use sysinfo::{CpuExt, System, SystemExt, Disk};
+use sysinfo::{CpuExt, System, SystemExt, Disk, NetworkExt, NetworksExt};
 use std::sync::{Arc, Mutex };
 use tokio::sync::broadcast;
 
 
 type Snapshot = Vec<f32>;
+
+struct d_and_c_Snaphot{
+    cpu_u: Vec<f32>,
+    // disk_info:  <'a>+&Disk,
+}
 
 #[tokio::main]
 async fn main() {
@@ -42,6 +47,17 @@ async fn main() {
     for disk in sys.disks(){
 
         println!("{:?}", disk);
+        let d = disk.to_owned();
+    }
+    println!("=> networks:" );
+    for (interface_name, data) in sys.networks(){
+
+         println!(
+        "[{}] in: {}, out: {}",
+            interface_name,
+            data.received(),
+            data.transmitted(),
+        );
     }
 
     //Update CPU usage in the Background
