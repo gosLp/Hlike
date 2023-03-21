@@ -6,7 +6,7 @@ use axum::{
     Json,
     response::{IntoResponse, Html}, http::Response};
 use sysinfo::{CpuExt, System, SystemExt, Disk, NetworkExt, NetworksExt};
-use std::sync::{Arc, Mutex };
+use std::{sync::{Arc, Mutex }};
 use tokio::sync::broadcast;
 
 
@@ -15,10 +15,16 @@ type Snapshot = Vec<f32>;
 
 
 #[derive(Clone)]
-struct DAndcSnapshot<'a>{
+struct DAndcSnapshot{
     
     cpu_u: Vec<f32>,
-    disk_info:  &'a Disk,
+    network: network_usage,
+}
+
+#[derive(Clone)]
+struct network_usage{
+    transmited: u64,
+    received: u64
 }
 
 #[tokio::main]
@@ -28,11 +34,17 @@ async fn main() {
 
     let (tx, _)= broadcast::channel::<Snapshot>(10);
 
-    let (tx2,_) = broadcast::channel::<DAndcSnapshot>(10);
+    let (Dtx,_) = broadcast::channel::<DAndcSnapshot>(10);
+
 
     let app_state = AppState{
         tx: tx.clone()
     };
+
+    let d_app_state = DAppState{
+        Dtx: Dtx.clone()
+    };
+
 
     let app = Router::new()
         .route("/", get(root_get))
@@ -40,7 +52,8 @@ async fn main() {
         .route("/index.mjs", get(indexmjs_get))
         .route("/index.css",  get(indexcss_get))
         .route("/realtime/cpus", get(realtime_cpus_get))
-        .with_state(app_state.clone());
+        .with_state(app_state.clone())
+        .with_state(d_app_state);
 
 
     let app_state_for_bg = app_state.clone();
@@ -93,6 +106,12 @@ async fn main() {
 struct AppState{
     tx: broadcast::Sender<Snapshot>,
 
+}
+
+
+#[derive(Clone)]
+struct DAppState{
+    Dtx: broadcast::Sender<DAndcSnapshot>
 }
 
 #[axum::debug_handler]
