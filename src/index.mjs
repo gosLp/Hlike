@@ -59,27 +59,29 @@ function App(props){
 
 //this is with using websockets
 
-let url = new URL("/realtime/cpus", window.location.href);
-//  let url2 = new URL("/realtime/cn", window.location.href);
+// let url = new URL("/realtime/cpus", window.location.href);
+ let url2 = new URL("/realtime/cn", window.location.href);
 
 //http => ws
 //https => wss
-url.protocol = url.protocol.replace("http", "ws");
-// url2.protocol = url2.protocol.replace("http","ws");
+// url.protocol = url.protocol.replace("http", "ws");
+url2.protocol = url2.protocol.replace("http","ws");
 
-// let ws2 = new WebSocket(url.href);
+let ws2 = new WebSocket(url2.href);
 
-let ws = new WebSocket(url.href);
-ws.onmessage = (ev) =>{
-    console.log(JSON.parse(ev.data));
-    let json = JSON.parse(ev.data)
-    render(html`<${App} cpus=${json}></${App}>`, document.body);
-};
-
-// ws2.onmessage = (ev)=>{
+// let ws = new WebSocket(url.href);
+// ws.onmessage = (ev) =>{
 //     console.log(JSON.parse(ev.data));
-//     let json = JSON.parse(ev.data);
-// }
+//     let json = JSON.parse(ev.data)
+//     render(html`<${App} cpus=${json}></${App}>`, document.body);
+// };
+
+ws2.onmessage = (ev)=>{
+    console.log("Hello");
+    console.log(JSON.parse(ev.data));
+    let json = JSON.parse(ev.data);
+    render(html`<${App} cpus=${json.cpu_u}></${App}>`,document.body);
+}
 
 
 //

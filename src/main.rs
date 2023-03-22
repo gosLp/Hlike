@@ -101,17 +101,17 @@ async fn main() {
 
             let nu: Vec<(u64,u64)> = sys.networks().iter().map(|(name,data)| (data.received(),data.transmitted())).collect();
             // println!("usage: {:?}", nu);
-            
+
             let v: Vec<f32> = sys.cpus().iter().map(|cpu| cpu.cpu_usage()).collect();
             
-            let _ =tx.send(v);
+            // let _ =tx.send(v);
             
-            // let snap = DAndcSnapshot{
-            //     cpu_u: v,
-            //     network_usage: nu
-            // };
+            let snap = DAndcSnapshot{
+                cpu_u: v,
+                network_usage: nu
+            };
 
-            // let _ = dtx.send(snap);
+            let _ = dtx.send(snap);
 
             std::thread::sleep(System::MINIMUM_CPU_UPDATE_INTERVAL);
         }
