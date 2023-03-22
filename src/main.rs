@@ -8,19 +8,24 @@ use axum::{
 use sysinfo::{CpuExt, System, SystemExt, Disk, NetworkExt, NetworksExt};
 use std::{sync::{Arc, Mutex }};
 use tokio::sync::broadcast;
+use serde::Serialize;
+
 
 
 type Snapshot = Vec<f32>;
 
 
 
-#[derive(Clone)]
+#[derive(Clone, Serialize)]
 struct DAndcSnapshot{
     
     cpu_u: Vec<f32>,
     //network: network_usage,
     network_usage: Vec<(u64,u64)>,
 }
+
+// struct DAndcSnapshot(Vec<f32>, Vec<(u64,u64)>);
+
 
 type dSnapshot = DAndcSnapshot;
 
@@ -56,6 +61,7 @@ async fn main() {
         .route("/index.css",  get(indexcss_get))
         .route("/realtime/cpus", get(realtime_cpus_get))
         .with_state(app_state.clone())
+        .route("/realtime/cn", get(realtime_cpu_network_get))
         .with_state(d_app_state);
 
 
@@ -94,17 +100,18 @@ async fn main() {
             sys.refresh_all();
 
             let nu: Vec<(u64,u64)> = sys.networks().iter().map(|(name,data)| (data.received(),data.transmitted())).collect();
-            println!("usage: {:?}", nu);
+            // println!("usage: {:?}", nu);
+            
             let v: Vec<f32> = sys.cpus().iter().map(|cpu| cpu.cpu_usage()).collect();
             
-            // let _ =tx.send(v);
+            let _ =tx.send(v);
+            
+            // let snap = DAndcSnapshot{
+            //     cpu_u: v,
+            //     network_usage: nu
+            // };
 
-            let snap = DAndcSnapshot{
-                cpu_u: v,
-                network_usage: nu
-            };
-
-            let _ = dtx.send(snap);
+            // let _ = dtx.send(snap);
 
             std::thread::sleep(System::MINIMUM_CPU_UPDATE_INTERVAL);
         }
@@ -202,7 +209,7 @@ async fn realtime_cpu_network_stream(app_state: DAppState, mut ws: WebSocket){
 
 
     while let Ok(msg) = rx.recv().await{
-        ws.send(Message::Text(serde_json::to_string(&"wjfwjkfj").unwrap()))
+        ws.send(Message::Text(serde_json::to_string(&msg).unwrap()))
         .await
         .unwrap()
     }
