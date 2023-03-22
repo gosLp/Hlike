@@ -8,18 +8,18 @@ Hlike is a browser-based system monitor inspired by [htop](https://htop.dev/) an
 To install Hlike, you can clone this repository and run it locally:
 
 ```bash
-git clone https://github.com/<username>/hlike.git
+git clone https://github.com/gosLp/Hlike.git
 cd hlike
 cargo run --release
 ```
 
 ## Usage
 
-Once you have installed Hlike, you can open your browser and navigate to `http://localhost:3000` to view your system stats.
+Once you have installed Hlike, you can open your browser and navigate to `http://localhost:7832` to view your system stats.
 
 ## Credits
 
-This project was inspired by [htop](https://htop.dev/) and [fasterthanlime's video](https://www.youtube.com/watch?v=UJv8B1gV6Y8) on building a system monitor with Rust.
+This project was inspired by [htop](https://htop.dev/) and [fasterthanlime's video](https://www.youtube.com/watch?v=c_5Jy_AVDaM&t=2335s) on building a system monitor with Rust.
 
 ## Contributing
 
