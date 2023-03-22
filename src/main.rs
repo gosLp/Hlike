@@ -18,14 +18,17 @@ type Snapshot = Vec<f32>;
 struct DAndcSnapshot{
     
     cpu_u: Vec<f32>,
-    network: network_usage,
+    //network: network_usage,
+    network_usage: Vec<(u64,u64)>,
 }
 
-#[derive(Clone)]
-struct network_usage{
-    transmited: u64,
-    received: u64
-}
+type dSnapshot = DAndcSnapshot;
+
+// #[derive(Clone)]
+// struct network_usage{
+//     transmited: u64,
+//     received: u64
+// }
 
 #[tokio::main]
 async fn main() {
@@ -34,7 +37,7 @@ async fn main() {
 
     let (tx, _)= broadcast::channel::<Snapshot>(10);
 
-    let (Dtx,_) = broadcast::channel::<DAndcSnapshot>(10);
+    let (dtx,_) = broadcast::channel::<DAndcSnapshot>(10);
 
 
     let app_state = AppState{
@@ -42,7 +45,7 @@ async fn main() {
     };
 
     let d_app_state = DAppState{
-        Dtx: Dtx.clone()
+        dtx: dtx.clone()
     };
 
 
@@ -82,13 +85,26 @@ async fn main() {
     //Update CPU usage in the Background
     tokio::task::spawn_blocking(move ||{
         let mut sys = System::new();
+
         
 
         loop {
             
-            sys.refresh_cpu();
+            //  sys.refresh_cpu();
+            sys.refresh_all();
+
+            let nu: Vec<(u64,u64)> = sys.networks().iter().map(|(name,data)| (data.received(),data.transmitted())).collect();
+            println!("usage: {:?}", nu);
             let v: Vec<f32> = sys.cpus().iter().map(|cpu| cpu.cpu_usage()).collect();
-            let _ =tx.send(v);
+            
+            // let _ =tx.send(v);
+
+            let snap = DAndcSnapshot{
+                cpu_u: v,
+                network_usage: nu
+            };
+
+            let _ = dtx.send(snap);
 
             std::thread::sleep(System::MINIMUM_CPU_UPDATE_INTERVAL);
         }
@@ -111,7 +127,7 @@ struct AppState{
 
 #[derive(Clone)]
 struct DAppState{
-    Dtx: broadcast::Sender<DAndcSnapshot>
+    dtx: broadcast::Sender<DAndcSnapshot>
 }
 
 #[axum::debug_handler]
@@ -168,6 +184,28 @@ async fn realtime_cpus_get(
     ws.on_upgrade(|ws: WebSocket| async {
         realtime_cpus_stream(state, ws).await
     })
+}
+
+#[axum::debug_handler]
+async fn realtime_cpu_network_get(
+    ws: WebSocketUpgrade,
+    State(state): State<DAppState>,
+)-> impl IntoResponse{
+    ws.on_upgrade(|ws: WebSocket| async{
+        realtime_cpu_network_stream(state, ws).await
+    })
+} 
+
+
+async fn realtime_cpu_network_stream(app_state: DAppState, mut ws: WebSocket){
+    let mut rx = app_state.dtx.subscribe();
+
+
+    while let Ok(msg) = rx.recv().await{
+        ws.send(Message::Text(serde_json::to_string(&"wjfwjkfj").unwrap()))
+        .await
+        .unwrap()
+    }
 }
 
 async fn realtime_cpus_stream(app_state: AppState,mut ws:WebSocket) {
