@@ -1,6 +1,4 @@
-Sure! Here's an example of what your repository's markdown file could look like:
 
-```markdown
 # Hlike
 
 Hlike is a browser-based system monitor inspired by [htop](https://htop.dev/) and built with Rust. It displays your computer usage stats in the browser.
@@ -30,6 +28,3 @@ If you would like to contribute to this project, please feel free to submit a pu
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details.
-```
-
-I hope this helps! Let me know if you have any other questions.
