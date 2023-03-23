@@ -69,3 +69,20 @@ body{
     
 }
 
+
+.network-stats{
+    display: flex;
+    justify-content: center;
+
+}
+
+.network-stats-data-transmitted,.network-stats-data-received {
+    text-align: center;
+}
+
+.network-stats-data-transmitted h2,.network-stats-data-received h2 {
+    font-size: 1.5em;
+}
+.network-stats-data-transmitted p,.network-stats-data-received p {
+    font-size: 1.25em;
+}
