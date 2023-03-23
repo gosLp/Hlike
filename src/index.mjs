@@ -16,6 +16,17 @@ function App(props){
             `;
         })}
     </div>
+    <div class= "network-container"> 
+        ${props.network.map((network) =>{
+            return html`
+                <div class="network-bar">
+                    <label>Recieved Data:</label>
+                    ${network[0]}
+                    
+                </div>
+            `;
+        })}
+    </div>
     `;
 
     
@@ -77,10 +88,11 @@ let ws2 = new WebSocket(url2.href);
 // };
 
 ws2.onmessage = (ev)=>{
-    console.log("Hello");
     console.log(JSON.parse(ev.data));
+   
     let json = JSON.parse(ev.data);
-    render(html`<${App} cpus=${json.cpu_u}></${App}>`,document.body);
+    console.log(json.network_usage[1][0]);
+    render(html`<${App} cpus=${json.cpu_u} network=${json.network_usage}></${App}>`,document.body);
 }
 
 

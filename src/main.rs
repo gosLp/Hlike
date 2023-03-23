@@ -90,8 +90,14 @@ async fn main() {
 
     //Update CPU usage in the Background
     tokio::task::spawn_blocking(move ||{
-        let mut sys = System::new();
-
+        let mut sys = System::new_all();
+        // sys.refresh_networks();
+        // let mut network_data: Vec<(u64,u64)> = Vec::new();
+        // let networks = sys.networks();
+        // for (_, data) in networks{
+        //     network_data.push((data.received(), data.transmitted()));
+        // }   
+        // println!("{:?}",network_data);
         
 
         loop {
@@ -99,7 +105,11 @@ async fn main() {
             //  sys.refresh_cpu();
             sys.refresh_all();
 
-            let nu: Vec<(u64,u64)> = sys.networks().iter().map(|(name,data)| (data.received(),data.transmitted())).collect();
+            // sys.refresh_networks();
+
+            let usage = sys.networks().iter().map(|(_,data)|(data.received(),data.transmitted())).collect::<Vec<(u64,u64)>>();
+            // println!("usage:{:?}", usage);
+            // let nu: Vec<(u64,u64)> = sys.networks().iter().map(|(name,data)| (data.received(),data.transmitted())).collect();
             // println!("usage: {:?}", nu);
 
             let v: Vec<f32> = sys.cpus().iter().map(|cpu| cpu.cpu_usage()).collect();
@@ -108,7 +118,7 @@ async fn main() {
             
             let snap = DAndcSnapshot{
                 cpu_u: v,
-                network_usage: nu
+                network_usage: usage,
             };
 
             let _ = dtx.send(snap);
@@ -229,5 +239,6 @@ async fn realtime_cpus_stream(app_state: AppState,mut ws:WebSocket) {
 
     }
     
+
 
 }
