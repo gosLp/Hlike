@@ -72,6 +72,7 @@ body{
 
 .network-stats{
     display: flex;
+    flex-direction: column;
     justify-content: center;
 
 }

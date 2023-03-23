@@ -16,17 +16,6 @@ function App(props){
             `;
         })}
     </div>
-    <div class= "network-container"> 
-        ${props.network.map((network) =>{
-            return html`
-                <div class="network-bar">
-                    <label>Recieved Data:</label>
-                    ${network[0]}
-                    
-                </div>
-            `;
-        })}
-    </div>
     <div class="network-stats">
         ${props.network.map((network) =>{
             return html`
